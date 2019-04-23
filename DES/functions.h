@@ -22,19 +22,19 @@ void Round3toR(int n, int i, double multipro);
 void LastRound(int round, double multipro);
 
 void Max_p(ElemType s_in, ElemType &s_out, int num, double &p);
-void Max_pro(ElemType s_in[8], ElemType s_out[8], double p[8]);
-void InitSbox(int round, int a, int b[9], int c);
-void SelectInDiff(ElemType a[8], ElemType b[8], int c[9], int sum, int i, int round);
+void Max_pro(ElemType *s_in, ElemType *s_out, double *p);
+void InitSbox(int round, int a, int *b, int c);
+void SelectInDiff(ElemType *a, ElemType *b, int *c, int sum, int i, int round);
 ElemType s_box(ElemType input, ElemType s[4][16]);
-ElemType SboxInDiff(ElemType a[8], ElemType b[8], int i);
-double MultiPro(double a[8], int k);
-void BitSplit(u64 a, ElemType b[8]);
-u32 BitMerge(ElemType a[8]);
-u32 Permute(ElemType a[8]);
+ElemType SboxInDiff(ElemType a[8], ElemType *b, int i);
+double MultiPro(double *a, int k);
+void BitSplit(u64 a, ElemType *b);
+u32 BitMerge(ElemType *a);
+u32 Permute(ElemType *a);
 u64 Extend(u32 a);
-u32 InvExtend(ElemType a[8], ElemType b[8]);
+u32 InvExtend(ElemType *a, ElemType *b);
 
-//µÚÒ»ÂÖ
+//ç¬¬ä¸€è½®
 void Round1() {
 	double temp_p1;
 	for (int i = 0; i <= 8; i++) {
@@ -77,7 +77,7 @@ void TravRound1(int s_num) {
 	}
 }
 
-//µÚ¶şÂÖ
+//ç¬¬äºŒè½®
 void Round2() {
 	double temp_p2;
 	for (int i = 0; i <= 8; i++) {
@@ -129,7 +129,7 @@ void TravRound2(int s_num1) {
 
 }
 
-//µİ¹é±éÀúsºĞÊä³ö£¬´Óiµ½n
+//é€’å½’éå†sç›’è¾“å‡ºï¼Œä»iåˆ°n
 void Trav_out(int i, int n) {
 	for (y[1][s[1][i]] = 0; y[1][s[1][i]] < 16; y[1][s[1][i]]++) {
 		if (P[s[1][i]][x[1][s[1][i]]][y[1][s[1][i]]] > -6) {
@@ -148,7 +148,7 @@ void Trav_out(int i, int n) {
 		}
 	}
 }
-//µÚÈıÂÖÖÁRÂÖ
+//ç¬¬ä¸‰è½®è‡³Rè½®
 void Round3toR(int n, int i, double multipro) {
 	Temp[i - 1] = Extend(X[i - 1]);
 	BitSplit(Temp[i - 1], x[i - 1]);
@@ -181,7 +181,7 @@ void TravRound3toR(int round, int s_num2) {
 	}
 }
 
-//×îºóÒ»ÂÖ
+//æœ€åä¸€è½®
 void LastRound(int round, double multipro)
 {
 	Temp[round - 1] = Extend(X[round - 1]);
@@ -222,12 +222,12 @@ void Max_p(ElemType s_in, ElemType &s_out, int num, double &p) {
 	s_out = max_out;
 	p = max;
 }
-// µ±ÂÖËùÓĞsºĞµÄ×î´ó¸ÅÂÊ
-void Max_pro(ElemType s_in[8], ElemType s_out[8], double p[8]) {
+// å½“è½®æ‰€æœ‰sç›’çš„æœ€å¤§æ¦‚ç‡
+void Max_pro(ElemType *s_in, ElemType *s_out, double *p) {
 	for (int i = 0; i < 8; i++) Max_p(s_in[i], s_out[i], i, p[i]);
 }
 
-void InitSbox(int round, int a, int b[9], int c) {
+void InitSbox(int round, int a, int *b, int c) {
 	if (c > 1) {
 		if (a != b[c]) InitSbox(round, a, b, c - 1);
 	}
@@ -239,7 +239,7 @@ void InitSbox(int round, int a, int b[9], int c) {
 		pro[round][a] = 0;
 	}
 }
-double MultiPro(double a[8], int k)
+double MultiPro(double *a, int k)
 {
 	double b = log2(1.0);
 	for (int j = 0; j < k; j++) b = b + a[j];
@@ -284,7 +284,7 @@ void TravSbox2_1() {
 void TravSbox2(int round, int num) {
 	switch (num)
 	{
-	case 0:                                       //Á½¸ö²»ÏàÁÚ£¬ÇÒÊ×Î²Ã»ÓĞÏàÁ¬
+	case 0:                                       //ä¸¤ä¸ªä¸ç›¸é‚»ï¼Œä¸”é¦–å°¾æ²¡æœ‰ç›¸è¿
 		for (mid[round][s[round][1]] = 1; mid[round][s[round][1]] < 4; mid[round][s[round][1]]++) {
 			for (mid[round][s[round][2]] = 1; mid[round][s[round][2]] < 4; mid[round][s[round][2]]++) {
 				x[round][s[round][1]] = SboxInDiff(fr[round], mid[round], s[round][1]);
@@ -300,7 +300,7 @@ void TravSbox2(int round, int num) {
 				}
 				else {
 					if (pro[round][s[round][1]] + pro[round][s[round][2]] + p[0] + B[r - 3] >= B[r - 1]) {
-						//±éÀúÊä³ö
+						//éå†è¾“å‡º
 						for (y[1][s[1][1]] = 0; y[1][s[1][1]] < 16; y[1][s[1][1]]++) {
 							if (P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]] > -6) {
 								pro[1][s[1][1]] = P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]];
@@ -327,7 +327,7 @@ void TravSbox2(int round, int num) {
 		}
 		break;
 
-	case 1:                                                  //Ê×Î²ÏàÁ¬
+	case 1:                                                  //é¦–å°¾ç›¸è¿
 		for (fr[round][0] = 0; fr[round][0] < 4; fr[round][0]++) {
 			for (fr[round][0] == 0 ? mid[round][0] = 1 : mid[round][0] = 0; mid[round][0] < 4; mid[round][0]++) {
 				for (fr[round][0] == 0 ? mid[round][7] = 1 : mid[round][7] = 0; mid[round][7] < 4; mid[round][7]++) {
@@ -344,7 +344,7 @@ void TravSbox2(int round, int num) {
 					}
 					else {
 						if (pro[round][s[round][1]] + pro[round][s[round][2]] + p[0] + B[r - 3] >= B[r - 1]) {
-							//±éÀúÊä³ö
+							//éå†è¾“å‡º
 							for (y[1][s[1][1]] = 0; y[1][s[1][1]] < 16; y[1][s[1][1]]++) {
 								if (P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]] > -6) {
 									pro[1][s[1][1]] = P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]];
@@ -372,7 +372,7 @@ void TravSbox2(int round, int num) {
 		}
 		break;
 
-	default:               //ÏàÁÚ
+	default:               //ç›¸é‚»
 		for (fr[round][s[round][2]] = 0; fr[round][s[round][2]] < 4; fr[round][s[round][2]]++) {
 			for (fr[round][s[round][2]] == 0 ? mid[round][s[round][1]] = 1 : mid[round][s[round][1]] = 0; mid[round][s[round][1]] < 4; mid[round][s[round][1]]++) {
 				for (fr[round][s[round][2]] == 0 ? mid[round][s[round][2]] = 1 : mid[round][s[round][2]] = 0; mid[round][s[round][2]] < 4; mid[round][s[round][2]]++) {
@@ -389,7 +389,7 @@ void TravSbox2(int round, int num) {
 					}
 					else {
 						if (pro[round][s[round][1]] + pro[round][s[round][2]] + p[0] + B[r - 3] >= B[r - 1]) {
-							//±éÀúÊä³ö
+							//éå†è¾“å‡º
 							for (y[1][s[1][1]] = 0; y[1][s[1][1]] < 16; y[1][s[1][1]]++) {
 								if (P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]] > -6) {
 									pro[1][s[1][1]] = P[s[1][1]][x[1][s[1][1]]][y[1][s[1][1]]];
@@ -440,17 +440,17 @@ void TravSbox3(int a, int j, int round) {
 		}
 	}
 }
-void SelectInDiff(ElemType a[8], ElemType b[8], int c[9], int sum, int i, int round) {
+void SelectInDiff(ElemType *a, ElemType *b, int *c, int sum, int i, int round) {
 	
 	if (i <= sum) {
-		if (c[i - 1] + 1 == c[i])			//µ±Ç°sºĞÓëÉÏÒ»¸öÏàÁÚ
+		if (c[i - 1] + 1 == c[i])			//å½“å‰sç›’ä¸ä¸Šä¸€ä¸ªç›¸é‚»
 		{
 			for ((a[c[i - 1]] | b[c[i - 1]]) == 0 ? a[c[i]] = 1 : a[c[i]] = 0; a[c[i]] < 4; a[c[i]]++) {
 				x[round][c[i - 1]] = SboxInDiff(a, b, c[i - 1]);
 				for (b[c[i]] = 0; b[c[i]] < 4; b[c[i]]++) {SelectInDiff(a, b, c, sum, i + 1, round);}
 			}
 		}
-		else {						//²»ÏàÁÚ
+		else {						//ä¸ç›¸é‚»
 			a[c[i]] = 0;
 			x[round][c[i - 1]] = SboxInDiff(a, b, c[i - 1]);
 			if (x[round][c[i - 1]] != 0) {
@@ -469,26 +469,26 @@ void SelectInDiff(ElemType a[8], ElemType b[8], int c[9], int sum, int i, int ro
 			}
 			else {
 				if (p[0] + p[1] + B[r - 3] >= B[r - 1]) {				
-					Trav_out(1, sum);                       //µİ¹é±éÀúsºĞÊä³ö£¬´Ó1µ½s_num1 
+					Trav_out(1, sum);                       //é€’å½’éå†sç›’è¾“å‡ºï¼Œä»1åˆ°s_num1 
 				}
 			}
 		}
 	}
 }
-ElemType SboxInDiff(ElemType a[8], ElemType b[8], int i) {
+ElemType SboxInDiff(ElemType *a, ElemType *b, int i) {
 	ElemType d;
 	d = (a[i] << 4) | (b[i] << 2) | a[(i + 1)%8];
 	return d;
 }
-void BitSplit(u64 a, ElemType b[8]) {
+void BitSplit(u64 a, ElemType *b) {
 	for (int i = 0; i < 8; i++) b[i] = (a >> (42 - 6 * i))&0x3f;
 }
-u32 BitMerge(ElemType a[8]) {
+u32 BitMerge(ElemType *a) {
 	u32 b=0x00000000;
 	for (int i = 0; i < 8; i++) b = b^Tr[i][a[i]];
 	return b;
 }
-u32 Permute(ElemType a[8]) {
+u32 Permute(ElemType *a) {
 	u32 b;
 	b = p1[a[0]] ^ p2[a[1]] ^ p3[a[2]] ^ p4[a[3]] ^ p5[a[4]] ^ p6[a[5]] ^ p7[a[6]] ^ p8[a[7]];
 	return b;
@@ -498,13 +498,13 @@ u64 Extend(u32 a) {
 	for (int i = 0; i < 8; i++) b = b^ext[i][(a >> (28 - 4 * i))&0xf];
 	return b;
 }
-//À©Õ¹Äæ±ä»»
-u32 InvExtend(ElemType a[8], ElemType b[8]) {
+//æ‰©å±•é€†å˜æ¢
+u32 InvExtend(ElemType *a, ElemType *b) {
 	u32 c = 0x00000000;
 	for (int i = 0; i < 8; i++) c = c^FExt[i][a[i]] ^ MExt[i][b[i]];
 	return c;
 }
-//¼ÆËãÏÂÒ»ÂÖºòÑ¡¸ÅÂÊ
+//è®¡ç®—ä¸‹ä¸€è½®å€™é€‰æ¦‚ç‡
 double CalCondidatePro(int round) {
 	double cp;
 	Y[round - 1] = Permute(y[round - 1]);
