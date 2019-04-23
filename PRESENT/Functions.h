@@ -14,14 +14,14 @@ void TravRound1(int sum, int i);
 void Round2toR(int round, double multipro);
 void LastRound();
 void TravOutDiff(int round, int num);
-void BitSplit(u64 a, ElemType b[16]);
-u64 BitMerge(ElemType a[16]);
+void BitSplit(u64 a, ElemType *b);
+u64 BitMerge(ElemType *a);
 void MaxDiffPro(ElemType a, double &b, ElemType &c);
-void InitSbox(int a, int b[17], int c);
-double MultiPro(double a[16]);
+void InitSbox(int a, int *b, int c);
+double MultiPro(double *a);
 double CalCondidatePro(int round);
 
-//³ÌĞòÖ´ĞĞÈë¿Ú£¬µÚÒ»ÂÖ
+//ç¨‹åºæ‰§è¡Œå…¥å£ï¼Œç¬¬ä¸€è½®
 void Round1() {
 	double temp_p;
 	for (int i = 1; i <= 16; i++) {
@@ -31,7 +31,7 @@ void Round1() {
 		if (temp_p + B[r - 2] > B[r - 1]) TravRound1(i, 1);
 	}
 }
-//±éÀúµÚÒ»ÂÖ,°´ÕÕ»îÔ¾sºĞ¸öÊı±éÀú
+//éå†ç¬¬ä¸€è½®,æŒ‰ç…§æ´»è·ƒsç›’ä¸ªæ•°éå†
 void TravRound1(int sum, int i) {
 	if (i <= sum) {
 		for (s[i] = s[i - 1] + 1; s[i] < 16 - (sum - i); s[i]++) {
@@ -54,8 +54,8 @@ void TravRound1(int sum, int i) {
 	}
 }
 
-//ÖØĞÂÑ¡¶¨»îÔ¾sºĞÊ±£¬½«²»»îÔ¾µÄ³õÊ¼»¯Îª0
-void InitSbox(int a, int b[17], int c) {
+//é‡æ–°é€‰å®šæ´»è·ƒsç›’æ—¶ï¼Œå°†ä¸æ´»è·ƒçš„åˆå§‹åŒ–ä¸º0
+void InitSbox(int a, int *b, int c) {
 	if (c > 1) {
 		if (a != b[c]) InitSbox(a, b, c - 1);
 	}
@@ -65,7 +65,7 @@ void InitSbox(int a, int b[17], int c) {
 		pro[0][a] = 0;
 	}
 }
-//µÚ¶şÂÖÖÁµ¹ÊıµÚ¶şÂÖ
+//ç¬¬äºŒè½®è‡³å€’æ•°ç¬¬äºŒè½®
 void Round2toR(int round, double multipro) {
 	if (r > 2) {
 		X[round - 1] = Permute(round - 2);
@@ -77,7 +77,7 @@ void Round2toR(int round, double multipro) {
 	}
 	else LastRound();
 }
-//±éÀúÊä³ö
+//éå†è¾“å‡º
 void TravOutDiff(int round, int num) {
 	if (num <= 15) {
 		if (x[round - 1][num] == 0) TravOutDiff(round, num + 1);
@@ -91,7 +91,7 @@ void TravOutDiff(int round, int num) {
 			}
 		}
 	}
-	else {                                            //16¸ösºĞÊä³ö¶¼ÒÑ±éÀú£¬Çóµ±Ç°ÂÖµÄ¸ÅÂÊ
+	else {                                            //16ä¸ªsç›’è¾“å‡ºéƒ½å·²éå†ï¼Œæ±‚å½“å‰è½®çš„æ¦‚ç‡
 		p[round - 1] = MultiPro(pro[round - 1]);
 		if (p[round - 1] + temp[round - 2] + B[r - round - 1] > B[r - 1]) {
 			temp[round - 1] = p[round - 1] + temp[round - 2];
@@ -100,7 +100,7 @@ void TravOutDiff(int round, int num) {
 		}
 	}
 }
-//×îºóÒ»ÂÖ
+//æœ€åä¸€è½®
 void LastRound() {
 	X[r - 1] = Permute(r - 2);
 	BitSplit(X[r - 1], x[r - 1]);
@@ -139,17 +139,17 @@ void LastRound() {
        */
 	}
 }
-//±ÈÌØÇĞÆ¬
-void BitSplit(u64 a, ElemType b[16]) {
+//æ¯”ç‰¹åˆ‡ç‰‡
+void BitSplit(u64 a, ElemType *b) {
 	for (int i = 0; i < 16; i++) b[i] = (a >> (4 * i)) & 0xf;
 }
-//±ÈÌØºÏ²¢
-u64 BitMerge(ElemType a[16]) {
+//æ¯”ç‰¹åˆå¹¶
+u64 BitMerge(ElemType *a) {
 	u64 b=0x0000000000000000;
 	for (int i = 0; i < 16; i++) b = b^T[i][a[i]];
 	return b;
 }
-//ÒÑÖªsºĞÊäÈë²î·ÖÇó×î´ó²î·Ö¸ÅÂÊ
+//å·²çŸ¥sç›’è¾“å…¥å·®åˆ†æ±‚æœ€å¤§å·®åˆ†æ¦‚ç‡
 void MaxDiffPro(ElemType a, double &b, ElemType &c) {
 	double maxpro = -4;
 	ElemType maxout;
@@ -163,13 +163,13 @@ void MaxDiffPro(ElemType a, double &b, ElemType &c) {
 	c = maxout;
 	b = maxpro;
 }
-//¸ÅÂÊ³Ë»ı
-double MultiPro(double a[16]) {
+//æ¦‚ç‡ä¹˜ç§¯
+double MultiPro(double *a) {
 	double b = 0;
 	for (int i = 0; i < 16; i++) b = b + a[i];
 	return b;
 }
-//¼ÆËãÄ³ÂÖµÄ³õÊ¼ºòÑ¡¸ÅÂÊ
+//è®¡ç®—æŸè½®çš„åˆå§‹å€™é€‰æ¦‚ç‡
 double CalCondidatePro(int round) {
 	Y[round - 1] = BitMerge(y[round - 1]);
 	X[round] = Permute(round - 1);
